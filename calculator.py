@@ -105,8 +105,17 @@ def reverse():
 def onClick(name):
     display.insert(END,name)
 
+def pCent():
+    try:
+        y = str(float(display.get())/100.0)
+        clear()
+        display.insert(0,y)
+    except:
+        clear()
+        display.insert(0,"0")
+
 # create perCent button
-perCent = ttk.Button(buttonFrame,text='%',command=lambda: onClick("%"))
+perCent = ttk.Button(buttonFrame,text='%',command= pCent)
 perCent.grid(row=1,column=1,padx=px,pady=py) # insert perCent button in interface
 
 #create ce button
