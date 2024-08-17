@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+import math
 
 master = Tk()
 master.geometry("350x220")
@@ -40,12 +41,14 @@ def c():
 # command function for ce button
 def ce():
     lastNumeric = display.get()
-    i = 1
-    while lastNumeric[len(lastNumeric)-i].isnumeric():
-        i +=1
+    try:
+        i = 1
+        while lastNumeric[len(lastNumeric)-i].isnumeric():
+            i +=1
 
-    display.delete(len(display.get())-i+1,len(display.get()))
-
+        display.delete(len(display.get())-i+1,len(display.get()))
+    except:
+        display.delete(0,END)
 
 
 # command function for equal button
@@ -79,9 +82,10 @@ def inverse():
         display.insert(0,"Error")
 
 # command function for sqrt button
-def sqrt():
+def sqroot():
+    input = float(display.get())
     try:
-        y = str(squareRoot(float(display.get())))
+        y = str(math.sqrt(input))
         display.delete(0, END)
         display.insert(0, y)
     except:
@@ -126,7 +130,7 @@ power2 = ttk.Button(buttonFrame,text='^2',command=power2)
 power2.grid(row=2,column=2,padx=px,pady=py) # insert power2 button in interface
 
 #  create square root button
-squareRoot = ttk.Button(buttonFrame,text='sqrt()',command=sqrt)
+squareRoot = ttk.Button(buttonFrame,text='sqrt()',command=sqroot)
 squareRoot.grid(row=2,column=3,padx=px,pady=py) # insert square root button in interface
 
 # create division button
