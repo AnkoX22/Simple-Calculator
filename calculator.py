@@ -41,14 +41,15 @@ def c():
 # command function for ce button
 def ce():
     lastNumeric = display.get()
-    try:
+    if(lastNumeric.isnumeric()):
+        clear()
+    else:
         i = 1
-        while lastNumeric[len(lastNumeric)-i].isnumeric():
+        while ('/' in lastNumeric) | ('*' in lastNumeric) | ('+' in lastNumeric) | ('-' in lastNumeric):
+            lastNumeric = lastNumeric[1:]
             i +=1
 
-        display.delete(len(display.get())-i+1,len(display.get()))
-    except:
-        display.delete(0,END)
+        display.delete(i-1,END)
 
 
 # command function for equal button
