@@ -9,207 +9,173 @@ master.title("Simple Calculator")
 buttonFrame = Frame(master)
 buttonFrame.pack(side=BOTTOM)
 
+display_frame = Frame(master)
+display_frame.pack()
 
-
-displayFrame = Frame(master)
-displayFrame.pack()
-
-input = StringVar()
+user_input = StringVar()
 
 # create constants for interface
 h = 3
 w = 5
 px = 2
 py = 2
-num1=0
-num2=0
 
-
-#the display entry for the input
-display = ttk.Entry(displayFrame,textvariable=input)
+# the display entry for the input
+display = ttk.Entry(display_frame, textvariable=user_input)
 display.pack(ipady=3)
+display.config(state='readonly')
+
+
+# updating the display
+def update_display(value):
+    display.config(state='normal')
+    display.delete(0, END)
+    display.insert(0, value)
+    display.config(state='readonly')
+
 
 # command function of clear button
 def clear():
+    display.config(state='normal')
     display.delete(0, END)
+    display.config(state='readonly')
+
 
 # command function for c button
-def c():
-    display.delete(len(display.get())-1,len(display.get()))
+def c(event=None):
+    display.config(state='normal')
+    display.delete(len(display.get())-1, len(display.get()))
+    display.config(state='readonly')
 
 
 # command function for ce button
 def ce():
-    lastNumeric = display.get()
-    if(lastNumeric.isnumeric()):
+    last_numeric = display.get()
+    if last_numeric.isnumeric():
         clear()
     else:
         i = 1
-        while ('/' in lastNumeric) | ('*' in lastNumeric) | ('+' in lastNumeric) | ('-' in lastNumeric):
-            lastNumeric = lastNumeric[1:]
-            i +=1
-
-        display.delete(i-1,END)
+        while ('/' in last_numeric) | ('*' in last_numeric) | ('+' in last_numeric) | ('-' in last_numeric):
+            last_numeric = last_numeric[1:]
+            i += 1
+        display.config(state='normal')
+        display.delete(i-1, END)
+        display.config(state='readonly')
 
 
 # command function for equal button
-def equal():
+def equal(event=None):
     try:
         y = str(eval(display.get()))
         display.delete(0, END)
-        display.insert(0, y)
-    except:
-        clear()
-        display.insert(0,"Error")
+        update_display(y)
+    except EXCEPTION:
+        update_display("Error, not valid input")
+
 
 # command function for the 2nd power button
 def power2():
     try:
-        y = str(pow(float(display.get()),2))
-        display.delete(0, END)
-        display.insert(0, y)
-    except:
-        clear()
-        display.insert(0,"Error")
+        y = str(pow(float(eval(display.get())), 2))
+        update_display(y)
+    except EXCEPTION:
+        update_display("Error, the number under the root cannot be negative")
 
-# command function for inverse function 
+
+# command function for inverse function
 def inverse():
     try:
         y = str(1/float(display.get()))
-        display.delete(0, END)
-        display.insert(0, y)
-    except:
-        clear()
-        display.insert(0,"Error")
+        update_display(y)
+    except ZeroDivisionError:
+        update_display("Error, you cannot divide with zero")
+
 
 # command function for sqrt button
-def sqroot():
-    input = float(display.get())
+def square_root():
+    float_input = float(eval(display.get()))
     try:
-        y = str(math.sqrt(input))
-        display.delete(0, END)
-        display.insert(0, y)
-    except:
-        clear()
-        display.insert(0,"Error")
+        y = str(math.sqrt(float_input))
+        update_display(y)
+    except EXCEPTION:
+        update_display("Error, the number cannot be negative")
+
 
 # command function for reverse button
 def reverse():
     try:
         y = str(-float(display.get()))
-        display.delete(0,END)
-        display.insert(0,y)
-    except:
-        display.insert(0,"Error")
+        update_display(y)
+    except EXCEPTION:
+        update_display("Error")
+
 
 # command function to insert in display the numbers of the pressed buttons
-def onClick(name):
-    display.insert(END,name)
+def on_click(name):
+    current_text = display.get() + name
+    update_display(current_text)
 
-def pCent():
+
+def per_cent():
     try:
         y = str(float(display.get())/100.0)
-        clear()
-        display.insert(0,y)
-    except:
-        clear()
-        display.insert(0,"0")
+        update_display(y)
+    except EXCEPTION:
+        update_display("0")
 
-# create perCent button
-perCent = ttk.Button(buttonFrame,text='%',command= pCent)
-perCent.grid(row=1,column=1,padx=px,pady=py) # insert perCent button in interface
 
-#create ce button
-ce = ttk.Button(buttonFrame,text='CE',command= ce)
-ce.grid(row=1,column=2,padx=px,pady=py) # insert ce button in interface
+def create_button(frame, input_text, input_command, input_row, input_column, pad_x, pad_y):
+    new_button = ttk.Button(frame, text=input_text, command=input_command)
+    new_button.grid(row=input_row, column=input_column, padx=pad_x, pady=pad_y)
+    master.grid_rowconfigure(input_row, weight=1)
+    master.grid_columnconfigure(input_column, weight=1)
+    return new_button
 
-# create c button
-c = ttk.Button(buttonFrame,text='C',command= c)
-c.grid(row=1,column=3,padx=px,pady=py) # insert c button in interface
 
-# create delete button
-delete = ttk.Button(buttonFrame,text='delete',command=clear) 
-delete.grid(row=1,column=4,padx=px,pady=py) # insert delete button in interface
+master.bind('<Return>', equal)
+master.bind('=', equal)
+master.bind('<BackSpace>', c)
 
-# create inverse button
-inverse = ttk.Button(buttonFrame,text='1/x',command=inverse)
-inverse.grid(row=2,column=1,padx=px,pady=py) # insert inverse button in interface
+for num in range(10):
+    master.bind(str(num), lambda event, n=num: on_click(str(n)))
 
-# create power2 button
-power2 = ttk.Button(buttonFrame,text='^2',command=power2)
-power2.grid(row=2,column=2,padx=px,pady=py) # insert power2 button in interface
+arithmetic_operations = ['+', '-', '/', '*', '(', ')']
 
-#  create square root button
-squareRoot = ttk.Button(buttonFrame,text='sqrt()',command=sqroot)
-squareRoot.grid(row=2,column=3,padx=px,pady=py) # insert square root button in interface
 
-# create division button
-division = ttk.Button(buttonFrame,text='/',command=lambda: onClick("/"))
-division.grid(row=2,column=4,padx=px,pady=py) # insert division button in interface
+for operator in arithmetic_operations:
+    master.bind(operator, lambda event, op=operator: on_click(op))
 
-# create the 7(number) button
-b7 = ttk.Button(buttonFrame,text='7',command=lambda: onClick("7"))
-b7.grid(row=3,column=1,padx=px,pady=py) # insert button 7 in interface
 
-# create button 8(number)
-b8 = ttk.Button(buttonFrame,text='8',command=lambda: onClick("8"))
-b8.grid(row=3,column=2,padx=px,pady=py) # insert button 8 in interface
+buttons = [
+    {'text': '%', 'command': per_cent, 'row': 1, 'column': 1},
+    {'text': 'CE', 'command': ce, 'row': 1, 'column': 2},
+    {'text': 'C', 'command': c, 'row': 1, 'column': 3},
+    {'text': 'Delete', 'command': clear, 'row': 1, 'column': 4},
+    {'text': '1/x', 'command': inverse, 'row': 2, 'column': 1},
+    {'text': '^2', 'command': power2, 'row': 2, 'column': 2},
+    {'text': 'sqrt()', 'command': square_root, 'row': 2, 'column': 3},
+    {'text': '/', 'command': lambda: on_click('/'), 'row': 2, 'column': 4},
+    {'text': '7', 'command': lambda: on_click('7'), 'row': 3, 'column': 1},
+    {'text': '8', 'command': lambda: on_click('8'), 'row': 3, 'column': 2},
+    {'text': '9', 'command': lambda: on_click('9'), 'row': 3, 'column': 3},
+    {'text': '*', 'command': lambda: on_click('*'), 'row': 3, 'column': 4},
+    {'text': '4', 'command': lambda: on_click('4'), 'row': 4, 'column': 1},
+    {'text': '5', 'command': lambda: on_click('5'), 'row': 4, 'column': 2},
+    {'text': '6', 'command': lambda: on_click('6'), 'row': 4, 'column': 3},
+    {'text': '-', 'command': lambda: on_click('-'), 'row': 4, 'column': 4},
+    {'text': '1', 'command': lambda: on_click('1'), 'row': 5, 'column': 1},
+    {'text': '2', 'command': lambda: on_click('2'), 'row': 5, 'column': 2},
+    {'text': '3', 'command': lambda: on_click('3'), 'row': 5, 'column': 3},
+    {'text': '+', 'command': lambda: on_click('+'), 'row': 5, 'column': 4},
+    {'text': '+/-', 'command': reverse, 'row': 6, 'column': 1},
+    {'text': '0', 'command': lambda: on_click('0'), 'row': 6, 'column': 2},
+    {'text': '.', 'command': lambda: on_click('.'), 'row': 6, 'column': 3},
+    {'text': '=', 'command': equal, 'row': 6, 'column': 4},
+]
 
-# create button 9(number)
-b9 = ttk.Button(buttonFrame,text='9',command=lambda: onClick("9"))
-b9.grid(row=3,column=3,padx=px,pady=py) # insert button 9 in interface
+for button in buttons:
+    create_button(buttonFrame, button['text'], button['command'], button['row'], button['column'], px, py)
 
-# create multiplication button
-multip = ttk.Button(buttonFrame,text='*',command=lambda: onClick("*"))
-multip.grid(row=3,column=4,padx=px,pady=py) # insert multiplication button in interface
-
-# create button 4 (number)
-b4 = ttk.Button(buttonFrame,text='4',command=lambda: onClick("4"))
-b4.grid(row=4,column=1,padx=px,pady=py) # insert four button in interface
-
-# create button 5 (number)
-b5 = ttk.Button(buttonFrame,text='5',command=lambda: onClick("5"))
-b5.grid(row=4,column=2,padx=px,pady=py) # insert button five in interface
-
-# create button 6 (number)
-b6 = ttk.Button(buttonFrame,text='6',command=lambda: onClick("6"))
-b6.grid(row=4,column=3,padx=px,pady=py) # insert button six in interface
-
-# create minus button
-minus = ttk.Button(buttonFrame,text='-',command=lambda: onClick("-"))
-minus.grid(row=4,column=4,padx=px,pady=py) # insert minus button in interface
-
-# create button 1 (number)
-b1 = ttk.Button(buttonFrame,text='1',command=lambda: onClick("1"))
-b1.grid(row=5,column=1,padx=px,pady=py) # insert button one in interface
-
-# create button 2 (number)
-b2 = ttk.Button(buttonFrame,text='2',command=lambda: onClick("2"))
-b2.grid(row=5,column=2,padx=px,pady=py) # insert button 2 in interface
-
-# create button 3 (number)
-b3 = ttk.Button(buttonFrame,text='3',command=lambda: onClick("3"))
-b3.grid(row=5,column=3,padx=px,pady=py) # insert button 3 in interface
-
-# create plus button
-plus = ttk.Button(buttonFrame,text='+',command=lambda: onClick("+"))
-plus.grid(row=5,column=4,padx=px,pady=py) # insert plus button in interface
-
-# create reverse button
-reverse = ttk.Button(buttonFrame,text='+/-',command=reverse)
-reverse.grid(row=6,column=1,padx=px,pady=py) # insert reverse button in interface
-
-# create  button 0 (number)
-b0 = ttk.Button(buttonFrame,text='0',command=lambda: onClick("0"))
-b0.grid(row=6,column=2,padx=px,pady=py) # insert zero button in interface
-
-# create dot button
-dot = ttk.Button(buttonFrame,text='.',command=lambda: onClick("."))
-dot.grid(row=6,column=3,padx=px,pady=py) # insert dot button in interface
-
-# create equal button
-equal = ttk.Button(buttonFrame,text='=',command=equal)
-equal.grid(row=6,column=4,padx=px,pady=py) # insert equal button in interface
 
 # run interface
 master.mainloop()
