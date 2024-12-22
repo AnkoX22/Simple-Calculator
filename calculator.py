@@ -7,10 +7,10 @@ master.geometry("350x220")
 master.title("Simple Calculator")
 
 buttonFrame = Frame(master)
-buttonFrame.pack(side=BOTTOM)
+buttonFrame.pack(fill='both', expand=True, side='bottom')
 
 display_frame = Frame(master)
-display_frame.pack()
+display_frame.pack(fill='both', expand=True, side='top')
 
 user_input = StringVar()
 
@@ -22,7 +22,7 @@ py = 2
 
 # the display entry for the input
 display = ttk.Entry(display_frame, textvariable=user_input)
-display.pack(ipady=3)
+display.pack(pady=py, padx=px, fill='both', expand=True)
 display.config(state='readonly')
 
 
@@ -126,9 +126,9 @@ def per_cent():
 
 def create_button(frame, input_text, input_command, input_row, input_column, pad_x, pad_y):
     new_button = ttk.Button(frame, text=input_text, command=input_command)
-    new_button.grid(row=input_row, column=input_column, padx=pad_x, pady=pad_y)
-    master.grid_rowconfigure(input_row, weight=1)
-    master.grid_columnconfigure(input_column, weight=1)
+    new_button.grid(row=input_row, column=input_column, padx=pad_x, pady=pad_y, sticky="nsew")
+    frame.grid_rowconfigure(input_row, weight=1)
+    frame.grid_columnconfigure(input_column, weight=1)
     return new_button
 
 
